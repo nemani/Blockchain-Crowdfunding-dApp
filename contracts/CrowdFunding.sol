@@ -12,6 +12,9 @@ contract CrowdFunding {
     mapping(uint => uint) private fundersIDFunding;
     mapping(address => uint) private addressID;
 
+    event ParticipateLogger(address indexed funder, uint totalFunders);
+    event FinalizeLogger(address beneficiary);
+
     modifier isbeneficiary() {
         require(msg.sender == beneficiary, "Cannot be called by you!");
         _;
@@ -33,47 +36,59 @@ contract CrowdFunding {
     }
 
     modifier goalReached() {
-        require(this.balance >= goal, "Not enough balance");
+        require(this.balance >= goal, "Goal Not Reached");
         _;
     }
 
     modifier goalFailed() {
-        require(this.balance < goal, "Not enough balance");
+        require(this.balance < goal, "Goal Reached");
         _;
     }
 
     constructor(uint _goal, uint _timelimit)
     public
     payable {
+        // require(_timelimit >= 120); // At Least 2 Mins
         beneficiary = msg.sender;
         goal = _goal;
-        deadline = startParticipation + _timelimit;
-        id = 0;
+        deadline = now + _timelimit;
     }
 
-    function participate(uint _pfee)
+    function participate()
     public
     payable
     isnotbeneficiary()
     notafterendtime()
     returns(uint) {
-        uint id = funders.push(msg.sender) - 1;
-        addressID[msg.sender] = id;
-        return tempID;
+        require(msg.value > 0, "Please send some amount!");
+        uint id = 0;
+        if (addressID[msg.sender] == 0) {
+            id = funders.push(msg.sender);
+            addressID[msg.sender] = id;
+        } else {
+            id = addressID[msg.sender];            
+        }
+
+        fundersIDFunding[id] += msg.value;
+        emit ParticipateLogger(msg.sender, funders.length);   
+        return id;
     }
 
     function effectivegoal()
     public
     view
-    returns(uint) {
-        return goal - this.balance;
+    returns(int) {
+        int goalInt = int(goal);
+        int balInt = int(this.balance);
+        return goalInt - balInt;
     }
 
     function finalize()
     public
-    notafterendtime()
+    onlyafterendtime()
     goalReached()
     isbeneficiary() {
+        emit FinalizeLogger(beneficiary);
         selfdestruct(beneficiary);
     }
 
@@ -82,9 +97,10 @@ contract CrowdFunding {
     isnotbeneficiary()
     onlyafterendtime()
     goalFailed() {
-        uint temp = fundersIDFunding[addressID[msg.sender]];
+        require(addressID[msg.sender] > 0);
+        uint amt = fundersIDFunding[addressID[msg.sender]];
         fundersIDFunding[addressID[msg.sender]] = 0;
-        msg.sender.transfer(temp);
+        msg.sender.transfer(amt);
     }
 }
 
