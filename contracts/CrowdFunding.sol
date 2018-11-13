@@ -8,15 +8,12 @@ contract CrowdFunding {
     uint private deadline;
     uint private startParticipation;
     uint private goal;
-    uint private totalRaised = 0;
-    uint private currentBalance=0;
-    uint private id;
 
     mapping(uint => uint) private fundersIDFunding;
     mapping(address => uint) private addressID;
 
     modifier isbeneficiary() {
-        require(msg.sender == beneficiary, "Can't be called");
+        require(msg.sender == beneficiary, "Cannot be called by you!");
         _;
     }
 
@@ -25,28 +22,23 @@ contract CrowdFunding {
         _;
     }
 
-    modifier notbeforestarttime(uint ptime) {
-        require(ptime >= startParticipation, "Can't participate before the starting time");
+    modifier notafterendtime() {
+        require(now <= deadline, "Crowd funding Session is already over");
         _;
     }
 
-    modifier notafterendtime(uint ptime) {
-        require(ptime <= deadline, "Crowd funding Session is already over");
+    modifier onlyafterendtime() {
+        require(now >= deadline, "Crowd funding session going on");
         _;
     }
 
-    modifier onlyafterendtime(uint ptime) {
-        require(ptime >= deadline, "Crowd funding session going on");
+    modifier goalReached() {
+        require(this.balance >= goal, "Not enough balance");
         _;
     }
 
-    modifier morebalance(uint balance) {
-        require(balance >= goal, "Not enough balance");
-        _;
-    }
-
-    modifier lessbalance(uint balance) {
-        require(balance < goal, "Not enough balance");
+    modifier goalFailed() {
+        require(this.balance < goal, "Not enough balance");
         _;
     }
 
@@ -55,7 +47,6 @@ contract CrowdFunding {
     payable {
         beneficiary = msg.sender;
         goal = _goal;
-        startParticipation = now;
         deadline = startParticipation + _timelimit;
         id = 0;
     }
@@ -64,15 +55,10 @@ contract CrowdFunding {
     public
     payable
     isnotbeneficiary()
-    notbeforestarttime(now)
-    notafterendtime(now)
+    notafterendtime()
     returns(uint) {
-        uint tempID = id;
-        funders.push(msg.sender) - 1;
+        uint id = funders.push(msg.sender) - 1;
         addressID[msg.sender] = id;
-        id = id + 1;
-        totalRaised = totalRaised + _pfee;
-        currentBalance = totalRaised;
         return tempID;
     }
 
@@ -80,14 +66,13 @@ contract CrowdFunding {
     public
     view
     returns(uint) {
-        uint te = goal - currentBalance;
-        return te;
+        return goal - this.balance;
     }
 
     function finalize()
     public
-    notafterendtime(now)
-    morebalance(currentBalance)
+    notafterendtime()
+    goalReached()
     isbeneficiary() {
         selfdestruct(beneficiary);
     }
@@ -95,8 +80,8 @@ contract CrowdFunding {
     function refund()
     public
     isnotbeneficiary()
-    onlyafterendtime(now)
-    lessbalance(currentBalance) {
+    onlyafterendtime()
+    goalFailed() {
         uint temp = fundersIDFunding[addressID[msg.sender]];
         fundersIDFunding[addressID[msg.sender]] = 0;
         msg.sender.transfer(temp);
