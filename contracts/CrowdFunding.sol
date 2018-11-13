@@ -1,7 +1,7 @@
 pragma solidity ^0.4.24;
 
 
-contract Crowdfunding {
+contract CrowdFunding {
     address private beneficiary;
     address[] private funders;
 
@@ -97,7 +97,7 @@ contract Crowdfunding {
     isnotbeneficiary()
     onlyafterendtime(now)
     lessbalance(currentBalance) {
-        uint temp = fundersIDFunding[addressID[msg.sender]]
+        uint temp = fundersIDFunding[addressID[msg.sender]];
         fundersIDFunding[addressID[msg.sender]] = 0;
         msg.sender.transfer(temp);
     }
