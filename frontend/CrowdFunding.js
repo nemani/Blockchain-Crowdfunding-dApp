@@ -1,4 +1,4 @@
-{
+const MyABI = {
   "contractName": "CrowdFunding",
   "abi": [
     {
@@ -7342,26 +7342,8 @@
       "links": {},
       "address": "0xf7568d37f1909c09a8d17b44c5d326abfdd02cb8",
       "transactionHash": "0xbd7bb16d7cb4c02d57c289bf7380d3b89eedae8200e3955da37188fe973c7436"
-    },
-    "1543492014126": {
-      "events": {},
-      "links": {},
-      "address": "0x92787f89d06b6df025814f5afe04b13827c598b8",
-      "transactionHash": "0x3d2eb3b5e40d34753e803e25279ebb29aa0b935c2b0aace4f337e0f94b93fc11"
-    },
-    "1543492830102": {
-      "events": {},
-      "links": {},
-      "address": "0x62b7fd00896edc3a3d364937ecad0680e672cdad",
-      "transactionHash": "0x1107c178f59458d0a3b5d12b490e310017b7e9709dfe9ad45cba5c5ef23f093a"
-    },
-    "1543816076910": {
-      "events": {},
-      "links": {},
-      "address": "0x768d972bcf68367ccefc0cd7a2e7cd7c0061bee8",
-      "transactionHash": "0xce3bfea4f5713b47f214299e3e2dd404a0355bfd8731be70a693fe368935d14a"
     }
   },
   "schemaVersion": "2.0.1",
-  "updatedAt": "2018-12-03T05:48:27.782Z"
+  "updatedAt": "2018-11-28T19:32:33.003Z"
 }

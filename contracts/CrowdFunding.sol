@@ -83,6 +83,13 @@ contract CrowdFunding {
         return goalInt - balInt;
     }
 
+    function numberoffunders()
+    public
+    view
+    returns(uint256) {
+        return funders.length;
+    }
+
     function finalize()
     public
     onlyafterendtime()

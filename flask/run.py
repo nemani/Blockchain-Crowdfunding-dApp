@@ -6,7 +6,7 @@ contracts_list = []
 
 @app.route("/")
 def hello():
-	return "Hello World!"
+	return json.dumps(contracts_list)
 
 
 @app.route("/get_data", methods=["GET"])
